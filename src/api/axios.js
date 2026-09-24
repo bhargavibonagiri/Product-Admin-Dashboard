@@ -1,32 +1,38 @@
 import axios from "axios"
 
 const api = axios.create({
-    baseURL: "https://dummyjson.com"
+    baseURL: "https://dummyjson.com",
+    headers: {
+        "Content-Type": "application/json"
+    }
 })
 
 api.interceptors.request.use(
-    (config) =>{
-        const token = localStorage.getItem("token")
+    (config) => {
+        const token = localStorage.getItem("token" )
 
-        if(token){
+        if (token && !config.url.includes("/auth/login")) {
             config.headers.Authorization = `Bearer ${token}`
         }
 
         return config
     },
-    (error)=>{
+    (error) => {
         return Promise.reject(error)
     }
 )
 
 api.interceptors.response.use(
-    (response) =>{
-        return Response
+    (response) => {
+        return response
     },
-    (error) =>{
-        if(error.response?.status === 401){
+    (error) => {
+        if (error.response?.status === 401) {
             localStorage.removeItem("token")
+            localStorage.removeItem("user")
         }
         return Promise.reject(error)
     }
 )
+
+export default api
